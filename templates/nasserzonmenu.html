@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	</head>
+	<body>
+		
+		<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">NasserZon</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/SmartPhone">SmartPhone</a></li>
+        <li><a href="/Desktop">Desktop</a></li>
+        <li><a href="/Laptop">Laptop</a></li>
+      </ul>
+      <form class="navbar-form navbar-left" action="Search" method="GET">
+        <div class="form-group">
+          <input type="text" name="keyword" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Search</button>
+      </form>
+      <a class="btn navbar-right">Logout</a>
+      <a class="btn navbar-right" href="/login">Login</a>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+  
+<a href="/Add" class="btn btn-success" style="margin:5px">New Item</a>
+{% if (count > 0) %}
+
+  {% for item in smartphones %}
+  {% if ((loop.index0  == 0 ) or (loop.index0 + 1  % 4 == 0)): %}
+  <div class="row">
+  {% endif %}  
+    <div class="col-md-3">
+        <div class="thumbnail">
+            <a href="/Show/{{item.id}}"><img src = "https://via.placeholder.com/200/" class="img-thumbnail" alt="{{item.name}}"></a>
+            <div class="caption" style="height:20%">
+              <a href="/Show/{{item.id}}"><h4>{{item.name}}</h4></a>
+              <a href="/Edit/{{item.id}}" class="btn btn-default" role="button">Edit</a>
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#product{{item.id}}">Delete</button>
+        </div>
+        </div>
+	  </div>
+    {% if ((loop.index0+1 % 4 == 0) or (loop.index0 == count - 1)): %}
+    </div>
+    {% endif %}
+
+{% endfor %}
+  
+{% else %}
+<div class="alert alert-danger" role="alert">No Results Found</div>
+
+ {% endif %} 
+ {% for item in smartphones %}
+ <!-- Modal -->
+  <div class="modal fade" id="product{{ item.id }}" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+      <!-- Modal content-->
+      <div class="modal-content" style="width:50%; height:30%">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Delete {{item.name}}</h4>
+        </div>
+        <div class="modal-body">
+         <div>
+            Are you Sure To Delete {{item.name}} ?
+            <br />
+            <br />
+            <form method="post" action="{{url_for('Delete', id = item.id)}}" style="margin:5px">
+                <button class="btn btn-danger" type="submit"> Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </form> 
+         
+       
+         </div>
+        </div>
+      
+      </div>
+
+    </div>
+  </div>
+{% endfor %}
+
+</div>
+
+
+<script
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</body>
+</html>
