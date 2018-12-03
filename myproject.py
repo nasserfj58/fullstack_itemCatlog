@@ -9,6 +9,8 @@ from storedb_setup import Base, Product, ProductType, User
 from oauth2client.client import flow_from_clientsecrets,FlowExchangeError
 import httplib2
 import requests
+from validate_email import validate_email
+
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 engine = create_engine('sqlite:///nasserzon.db')
 Base.metadata.bind = engine
@@ -26,6 +28,32 @@ def GetUserId(user_email):
         return user.id
     except:
         return None
+@app.route('/AddUsers',methods=['POST'])        
+def AddUser():
+    if request.method == 'POST':
+
+        uname = request.form['username']
+        password = request.form['pass']
+        email = request.form['email']
+
+        if not uname or not password or not email:
+            return render_template('login.html', message="All fileds are mandtory!!",uname=uname,email=email)
+        if not validate_email(email):
+              return render_template('login.html', message="Enter Valid Email!!",uname=uname,email=email)
+
+        if  len(password) < 8:
+             return render_template('login.html', message="Password must be Bigger than 7 chracters!!",uname=uname,email=email)
+        
+
+        login_session['username'] = request.form['username']
+        login_session['email'] = request.form['email']
+
+        myMenueItem = Product(name=request.form['name'], price=request.form['price'],
+        desc=request.form['desc'], typeId=request.form['ptype'])
+        
+        session.add(myMenueItem)
+        session.commit()
+    
 
 def CreateUser(login_session):
     newUser = User(name=login_session['username'],email=login_session['email'])
@@ -33,6 +61,11 @@ def CreateUser(login_session):
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
+
+@app.route('/logout')
+def logout():
+    gdisconnect()
+    return "You have loged out"
 
 @app.route('/',methods=['GET','POST'])
 @app.route('/<string:catagorey>',methods=['GET','POST'])
@@ -60,8 +93,8 @@ def Login():
         if request.method == 'POST':
             smartphones = session.query(Product).all() 
             return render_template('nasserzonmenu.html', smartphones=smartphones,count=len(smartphones))
-
-        return render_template('login.html',STATE=state)
+       
+        return render_template('login.html',STATE=state,message="",uname="",email="")
 
 @app.route('/gconnect',methods=['POST'])
 def gconnect():
@@ -211,6 +244,7 @@ def Edit(id):
         
     session = DBsession()
     myMenueItem = session.query(Product).filter_by(id=id).first()
+    
     if request.method == 'POST':
 
         myMenueItem.name=request.form['name']
