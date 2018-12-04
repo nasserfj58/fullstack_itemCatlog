@@ -12,7 +12,7 @@ import requests
 from validate_email import validate_email
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
-engine = create_engine('sqlite:///nasserzon.db')
+engine = create_engine('sqlite:///nasserzon.db?check_same_thread=false')
 Base.metadata.bind = engine
 
 DBsession = sessionmaker(bind=engine)
@@ -70,7 +70,7 @@ def logout():
 @app.route('/',methods=['GET','POST'])
 @app.route('/<string:catagorey>',methods=['GET','POST'])
 def GetProducts(catagorey='All'):
-        session = DBsession()
+     
         smartphones = []
         if catagorey and catagorey != 'All':
             ptype = session.query(ProductType).filter(ProductType.name.like(catagorey)).first()
@@ -205,7 +205,7 @@ def gdisconnect():
 
 @app.route('/Search')
 def Search():
-    session = DBsession()
+   
     keyword = request.args.get('keyword')
     
     smartphones = session.query(Product).filter(Product.name.like("%"+keyword+"%")).all()
@@ -220,7 +220,7 @@ def Add():
     if 'username' not in login_session :
         redirect('/login')
 
-    session = DBsession()
+  
     if request.method == 'POST':
         
         myMenueItem = Product(name=request.form['name'], price=request.form['price'],
@@ -242,7 +242,7 @@ def Edit(id):
     if 'username' not in login_session :
         redirect('/login')
         
-    session = DBsession()
+   
     myMenueItem = session.query(Product).filter_by(id=id).first()
     
     if request.method == 'POST':
@@ -264,7 +264,7 @@ def Edit(id):
 
 @app.route('/Show/<int:id>')
 def Show(id):
-    session = DBsession()
+    
     myMenueItem = session.query(Product).filter_by(id=id).first()
     ptypes = session.query(ProductType).all()
     
@@ -275,7 +275,7 @@ def Show(id):
 def Delete(id):
     if 'username' not in login_session :
         redirect('/login')
-    session = DBsession()
+  
     myMenueItem = session.query(Product).filter_by(id=id).first()
     if request.method == 'POST':
         
