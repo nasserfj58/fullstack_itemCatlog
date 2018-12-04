@@ -10,6 +10,9 @@ from oauth2client.client import flow_from_clientsecrets,FlowExchangeError
 import httplib2
 import requests
 from validate_email import validate_email
+from passlib.hash import bcrypt
+
+
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 engine = create_engine('sqlite:///nasserzon.db?check_same_thread=false')
@@ -35,6 +38,7 @@ def AddUser():
         uname = request.form['username']
         password = request.form['pass']
         email = request.form['email']
+        encryptPass = bcrypt.encrypt(password)
 
         if not uname or not password or not email:
             return render_template('login.html', message="All fileds are mandtory!!",uname=uname,email=email)
@@ -45,11 +49,21 @@ def AddUser():
              return render_template('login.html', message="Password must be Bigger than 7 chracters!!",uname=uname,email=email)
         
 
+
         login_session['username'] = request.form['username']
         login_session['email'] = request.form['email']
 
-        myMenueItem = Product(name=request.form['name'], price=request.form['price'],
-        desc=request.form['desc'], typeId=request.form['ptype'])
+        userId = GetUserId(email)
+        
+        if not userId :
+            return render_template('login.html', message="Email Is Registed already!!",uname=uname,email=email)
+
+        userInfo = GetUserInfo(userId)
+        if userInfo.username == uname:
+              return render_template('login.html', message="Username Is Registed already!!",uname=uname,email=email)
+
+        myMenueItem = User(username=request.form['username'], email=request.form['email'],
+        password=encryptPass)
         
         session.add(myMenueItem)
         session.commit()
