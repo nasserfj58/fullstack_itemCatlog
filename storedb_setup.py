@@ -1,5 +1,5 @@
 import sys
-from sqlalchemy import Column, Integer, String, ForeignKey,NUMERIC
+from sqlalchemy import Column, Integer, String, ForeignKey,NUMERIC,LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -10,7 +10,7 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'user'
-    name = Column(
+    username = Column(
         String(100), nullable = False        
     )
     id = Column(
@@ -18,6 +18,9 @@ class User(Base):
     )
     email = Column(
         String(250), nullable = False
+    )
+    password = Column(
+        LargeBinary, nullable = False
     )
 
 class ProductType(Base):
