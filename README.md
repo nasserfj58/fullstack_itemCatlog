@@ -5,10 +5,11 @@ This project is part of Udacity Full-stack nanodgree.
 
 This repo contaian 2 python files and html taemblets folder.
 
-I used Bootstrap, jquery, Google authentaction, facebook authentecation, github authentication.
+I used Bootstrap, jquery, Google authentaction, bycrypt libarary for hashing and validate_email libarary for validating emails :).
 
 
 To try this code You need to:
+
 0. download ane install virtualbox, vagrant,python and flask
 1. Open your terminal and go to the path of vagrant 
 2. Run vagrant up
