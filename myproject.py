@@ -322,51 +322,7 @@ def Delete(id):
         
         
         return redirect(url_for('GetProducts'))
-
-@app.route('/hello')
-def HelloWordl():
-    
-    x = json.dumps(getPhoto().json()['hits'][0]['webformatURL'])
-    
-    n = '''
-            <html>
-                <body>
-                <img src=%s>
-                </body>
-            </html>
-            '''
-    response = "".join(n % x)
-    
-    return response
-    return x.hits[0]
-    restaurant = session.query(ProductType).first()
-    items = session.query(ProductType).filter_by(restaurant_id=restaurant.id)
-    if restaurant is None or not items:
-        return "No resturant found"
-
-    return render_template('menu.html', restaurant=restaurant, items=items)
-
-
-@app.route('/menu/<int:res_id>/')
-def GetMenu(res_id):
-    restaurant = session.query(ProductType).filter_by(id=res_id).first()
-    items = session.query(ProductType).filter_by(restaurant_id=restaurant.id)
-
-    if restaurant is None or not items:
-        return "No restaurant found"
-
-    return render_template('menu.html', restaurant=restaurant, items=items)
-
-
-
-def deleteMenuItem(restaurant_id, menu_id):
-    return "page to delete a menu item. Task 3 complete!"
-
-def getPhoto(name):
-    res = requests.get('https://pixabay.com/api/?key=10821391-42c0faabd31442d2f044a4eb5&q='+name+'&image_type=photo')
-    if res.ok:
-        return res
-        
+  
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
