@@ -10,9 +10,8 @@ from oauth2client.client import flow_from_clientsecrets,FlowExchangeError
 import httplib2
 import requests
 from validate_email import validate_email
-from passlib.hash import bcrypt
-
-
+import bcrypt
+ 
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 engine = create_engine('sqlite:///nasserzon.db?check_same_thread=false')
@@ -23,11 +22,11 @@ session = DBsession()
 app = Flask(__name__)
 
 def GetUserInfo(user_id):
-    user = session.query(User).filter_by(id=user_id).one()
+    user = session.query(User).filter_by(id=user_id).first()
     return user
 def GetUserId(user_email):
     try:
-        user = session.query(User).filter_by(email=user_email).one()
+        user = session.query(User).filter_by(email=user_email).first()
         return user.id
     except:
         return None
@@ -38,35 +37,31 @@ def AddUser():
         uname = request.form['username']
         password = request.form['pass']
         email = request.form['email']
-        encryptPass = bcrypt.encrypt(password)
+        hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
         if not uname or not password or not email:
-            return render_template('login.html', message="All fileds are mandtory!!",uname=uname,email=email)
+            return render_template('register.html', message="All fileds are mandtory!!",uname=uname,email=email)
         if not validate_email(email):
-              return render_template('login.html', message="Enter Valid Email!!",uname=uname,email=email)
+              return render_template('register.html', message="Enter Valid Email!!",uname=uname,email=email)
 
         if  len(password) < 8:
-             return render_template('login.html', message="Password must be Bigger than 7 chracters!!",uname=uname,email=email)
-        
-
-
-        login_session['username'] = request.form['username']
-        login_session['email'] = request.form['email']
+             return render_template('register.html', message="Password must be Bigger than 7 chracters!!",uname=uname,email=email)
 
         userId = GetUserId(email)
         
-        if not userId :
-            return render_template('login.html', message="Email Is Registed already!!",uname=uname,email=email)
+        if userId :
+            return render_template('register.html', message="Email Is Registed already!!",uname=uname,email=email)
 
         userInfo = GetUserInfo(userId)
-        if userInfo.username == uname:
-              return render_template('login.html', message="Username Is Registed already!!",uname=uname,email=email)
+        if userInfo:
+              return render_template('register.html', message="Username Is Registed already!!",uname=uname,email=email)
 
         myMenueItem = User(username=request.form['username'], email=request.form['email'],
-        password=encryptPass)
+        password=hashed)
         
         session.add(myMenueItem)
         session.commit()
+        redirect('/login')
     
 
 def CreateUser(login_session):
@@ -75,6 +70,9 @@ def CreateUser(login_session):
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
+@app.route('/register')
+def register():
+    return render_template('register.html', message="",uname="",email="")
 
 @app.route('/logout')
 def logout():
@@ -105,6 +103,32 @@ def Login():
         login_session['state'] = state
         session = DBsession()
         if request.method == 'POST':
+            password = request.form['pass']
+            
+            email = request.form['email']
+           
+            if  not password or not email:
+                return render_template('login.html', message="All fileds are mandtory!!",uname="",email=email)
+            
+            if not validate_email(email):
+                  return render_template('login.html', message="Enter Valid Email!!",uname="",email=email)
+
+            userId = GetUserId(email)
+        
+            if not userId :
+                return render_template('login.html', message="No user found !!",uname="",email=email)
+
+            userInfo = GetUserInfo(userId)
+            
+            if not userInfo:
+                  return render_template('login.html', message="No user found !!",uname="",email=email)
+                  
+            if not userInfo.password or not bcrypt.checkpw(password.encode("utf-8"), userInfo.password):
+                 return render_template('login.html', message="Wrong Password !!",uname="",email=email)
+
+            login_session['uname'] = userInfo.username
+            login_session['email'] = userInfo.username
+
             smartphones = session.query(Product).all() 
             return render_template('nasserzonmenu.html', smartphones=smartphones,count=len(smartphones))
        
