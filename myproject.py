@@ -9,8 +9,12 @@ from storedb_setup import Base, Product, ProductType, User
 from oauth2client.client import flow_from_clientsecrets,FlowExchangeError
 import httplib2
 import requests
+from validate_email import validate_email
+import bcrypt
+ 
+
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
-engine = create_engine('sqlite:///nasserzon.db')
+engine = create_engine('sqlite:///nasserzon.db?check_same_thread=false')
 Base.metadata.bind = engine
 
 DBsession = sessionmaker(bind=engine)
@@ -18,14 +22,47 @@ session = DBsession()
 app = Flask(__name__)
 
 def GetUserInfo(user_id):
-    user = session.query(User).filter_by(id=user_id).one()
+    user = session.query(User).filter_by(id=user_id).first()
     return user
 def GetUserId(user_email):
     try:
-        user = session.query(User).filter_by(email=user_email).one()
+        user = session.query(User).filter_by(email=user_email).first()
         return user.id
     except:
         return None
+@app.route('/AddUsers',methods=['POST'])        
+def AddUser():
+    if request.method == 'POST':
+
+        uname = request.form['username']
+        password = request.form['pass']
+        email = request.form['email']
+        hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+
+        if not uname or not password or not email:
+            return render_template('register.html', message="All fileds are mandtory!!",uname=uname,email=email)
+        if not validate_email(email):
+              return render_template('register.html', message="Enter Valid Email!!",uname=uname,email=email)
+
+        if  len(password) < 8:
+             return render_template('register.html', message="Password must be Bigger than 7 chracters!!",uname=uname,email=email)
+
+        userId = GetUserId(email)
+        
+        if userId :
+            return render_template('register.html', message="Email Is Registed already!!",uname=uname,email=email)
+
+        userInfo = GetUserInfo(userId)
+        if userInfo:
+              return render_template('register.html', message="Username Is Registed already!!",uname=uname,email=email)
+
+        myMenueItem = User(username=request.form['username'], email=request.form['email'],
+        password=hashed)
+        
+        session.add(myMenueItem)
+        session.commit()
+        redirect('/login')
+    
 
 def CreateUser(login_session):
     newUser = User(name=login_session['username'],email=login_session['email'])
@@ -33,11 +70,19 @@ def CreateUser(login_session):
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
+@app.route('/register')
+def register():
+    return render_template('register.html', message="",uname="",email="")
+
+@app.route('/logout')
+def logout():
+    gdisconnect()
+    return "You have loged out"
 
 @app.route('/',methods=['GET','POST'])
 @app.route('/<string:catagorey>',methods=['GET','POST'])
 def GetProducts(catagorey='All'):
-        session = DBsession()
+     
         smartphones = []
         if catagorey and catagorey != 'All':
             ptype = session.query(ProductType).filter(ProductType.name.like(catagorey)).first()
@@ -58,10 +103,36 @@ def Login():
         login_session['state'] = state
         session = DBsession()
         if request.method == 'POST':
+            password = request.form['pass']
+            
+            email = request.form['email']
+           
+            if  not password or not email:
+                return render_template('login.html', message="All fileds are mandtory!!",uname="",email=email)
+            
+            if not validate_email(email):
+                  return render_template('login.html', message="Enter Valid Email!!",uname="",email=email)
+
+            userId = GetUserId(email)
+        
+            if not userId :
+                return render_template('login.html', message="No user found !!",uname="",email=email)
+
+            userInfo = GetUserInfo(userId)
+            
+            if not userInfo:
+                  return render_template('login.html', message="No user found !!",uname="",email=email)
+                  
+            if not userInfo.password or not bcrypt.checkpw(password.encode("utf-8"), userInfo.password):
+                 return render_template('login.html', message="Wrong Password !!",uname="",email=email)
+
+            login_session['uname'] = userInfo.username
+            login_session['email'] = userInfo.username
+
             smartphones = session.query(Product).all() 
             return render_template('nasserzonmenu.html', smartphones=smartphones,count=len(smartphones))
-
-        return render_template('login.html',STATE=state)
+       
+        return render_template('login.html',STATE=state,message="",uname="",email="")
 
 @app.route('/gconnect',methods=['POST'])
 def gconnect():
@@ -172,7 +243,7 @@ def gdisconnect():
 
 @app.route('/Search')
 def Search():
-    session = DBsession()
+   
     keyword = request.args.get('keyword')
     
     smartphones = session.query(Product).filter(Product.name.like("%"+keyword+"%")).all()
@@ -187,7 +258,7 @@ def Add():
     if 'username' not in login_session :
         redirect('/login')
 
-    session = DBsession()
+  
     if request.method == 'POST':
         
         myMenueItem = Product(name=request.form['name'], price=request.form['price'],
@@ -209,8 +280,9 @@ def Edit(id):
     if 'username' not in login_session :
         redirect('/login')
         
-    session = DBsession()
+   
     myMenueItem = session.query(Product).filter_by(id=id).first()
+    
     if request.method == 'POST':
 
         myMenueItem.name=request.form['name']
@@ -230,7 +302,7 @@ def Edit(id):
 
 @app.route('/Show/<int:id>')
 def Show(id):
-    session = DBsession()
+    
     myMenueItem = session.query(Product).filter_by(id=id).first()
     ptypes = session.query(ProductType).all()
     
@@ -241,7 +313,7 @@ def Show(id):
 def Delete(id):
     if 'username' not in login_session :
         redirect('/login')
-    session = DBsession()
+  
     myMenueItem = session.query(Product).filter_by(id=id).first()
     if request.method == 'POST':
         
@@ -250,51 +322,7 @@ def Delete(id):
         
         
         return redirect(url_for('GetProducts'))
-
-@app.route('/hello')
-def HelloWordl():
-    
-    x = json.dumps(getPhoto().json()['hits'][0]['webformatURL'])
-    
-    n = '''
-            <html>
-                <body>
-                <img src=%s>
-                </body>
-            </html>
-            '''
-    response = "".join(n % x)
-    
-    return response
-    return x.hits[0]
-    restaurant = session.query(ProductType).first()
-    items = session.query(ProductType).filter_by(restaurant_id=restaurant.id)
-    if restaurant is None or not items:
-        return "No resturant found"
-
-    return render_template('menu.html', restaurant=restaurant, items=items)
-
-
-@app.route('/menu/<int:res_id>/')
-def GetMenu(res_id):
-    restaurant = session.query(ProductType).filter_by(id=res_id).first()
-    items = session.query(ProductType).filter_by(restaurant_id=restaurant.id)
-
-    if restaurant is None or not items:
-        return "No restaurant found"
-
-    return render_template('menu.html', restaurant=restaurant, items=items)
-
-
-
-def deleteMenuItem(restaurant_id, menu_id):
-    return "page to delete a menu item. Task 3 complete!"
-
-def getPhoto(name):
-    res = requests.get('https://pixabay.com/api/?key=10821391-42c0faabd31442d2f044a4eb5&q='+name+'&image_type=photo')
-    if res.ok:
-        return res
-        
+  
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
