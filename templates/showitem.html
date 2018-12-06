@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="../static/CSS/app.css">
 	</head>
 	<body>
 		
@@ -25,14 +25,17 @@
         <li><a href="/Desktop">Desktop</a></li>
         <li><a href="/Laptop">Laptop</a></li>
       </ul>
-      <form class="navbar-form navbar-left" action="/Search" method="GET">
+      <form id="header" class="navbar-form navbar-left" action="/Search" method="GET">
             <div class="form-group">
               <input type="text" name="keyword" class="form-control" placeholder="Search">
             </div>
             <button type="submit" class="btn btn-default">Search</button>
           </form>
-      <a class="btn navbar-right">Logout</a>
-      <a class="btn navbar-right">Login</a>
+          {% if 'username' in session and session['username'] %}
+          <a href ="/logout" class="btn navbar-right">Logout</a>
+          {% else %}
+          <a class="btn navbar-right" href="/login">Login</a>
+          {% endif %}
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
