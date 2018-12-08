@@ -15,16 +15,23 @@
 <body>
     <div class="container input-group" style="width: 50%; height: 50%;margin: 10%">
         <div class="row">
+
+            {% if message %}
+            <div class="alert alert-danger" role="alert">{{message}}</div>
+            {% endif %}
+
             <h1>NasserZon</h1>
+            <div id='result'></div>
             <br />
             <div class="col-md-6">
 
-                <form method="post" action="{{url_for('GetProducts')}}">
+                <form method="post" action="{{url_for('Login')}}">
+
                     <div>
-                        <label for="name">UserName</label>
+                        <label for="name">Email</label>
                         <br />
 
-                        <input class="form-control" type="text" name="name" placeholder="UserName" />
+                        <input class="form-control required" type="email" name="email" placeholder="Email" value="{{email}}" />
 
 
                     </div>
@@ -33,66 +40,63 @@
 
                     <div>
                         <label for="desc">Password</label>
-                        <input class="form-control" type="text" name="pass" placeholder="Password" />
+                        <input class="form-control required" type="password" name="pass" placeholder="Password" />
 
                     </div>
                     <br />
                     <br />
-
+                    <br />
                     <div>
-                        <input type="submit" class="btn btn-default" value="Sigin" />
-                        <a type="submit" class="btn btn-default" value="FaceBook">FaceBook</a>
+                        <input type="submit" class="btn btn-default" value="Login" />
+                        <a class="btn btn-default" href="/register"> Register</a>
+                        <a class="btn btn-default" href="/forgot">Forgot Password?</a>
+                        <br />
+                        <br />
                         <div id="signinButton">
-                                <span class="g-signin" data-scope="openid email" data-clientid="359478250047-681lrv2p0kec1r329e5v3tnd6d7820c3.apps.googleusercontent.com"
-                                    data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin"
-                                    data-callback="signInCallback" data-approvalprompt="force">
-                                </span>
-                            </div>
-    
-                        <div id='result'></div>
+                            <span class="g-signin" data-scope="openid email" data-clientid="359478250047-681lrv2p0kec1r329e5v3tnd6d7820c3.apps.googleusercontent.com"
+                                data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin"
+                                data-callback="signInCallback" data-approvalprompt="force">
+                            </span>
+                        </div>
 
                     </div>
-                    <br />
 
-                </form>
-            </div>
-        </div>
-    </div>
-    <script>
-        function signInCallback(authResult) {
-            if (authResult['code']) {
-                $('#signinButton').hide();
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/gconnect?state={{STATE}}',
-                    processData: false,
-                    data: authResult['code'],
-                    contentType: 'application/octet-stream; charset=utf-8',
-                    success: function (result) {
-                        // Handle or verify the server response if necessary.
-                        if (result) {
-                            $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
-                            setTimeout(function () {
-                                window.location.href = "/restaurant";
-                            }, 4000);
+                    <script>
+                        function signInCallback(authResult) {
+                            if (authResult['code']) {
+                                $('#signinButton').hide();
 
-                        } else if (authResult['error']) {
-                            console.log('There was an error: ' + authResult['error']);
-                        } else {
-                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/gconnect?state={{STATE}}',
+                                    processData: false,
+                                    data: authResult['code'],
+                                    contentType: 'application/octet-stream; charset=utf-8',
+                                    success: function (result) {
+                                        // Handle or verify the server response if necessary.
+                                        if (result) {
+                                            $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+                                            setTimeout(function () {
+                                                window.location.href = "/";
+                                            }, 4000);
+
+                                        } else if (authResult['error']) {
+                                            console.log('There was an error: ' + authResult['error']);
+                                        } else {
+                                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                                        }
+                                    }
+
+                                });
+                            }
                         }
-                    }
 
-                });
-            }
-        }
-
-    </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+                    </script>
+                    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+                        crossorigin="anonymous"></script>
+                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+                        crossorigin="anonymous"></script>
 </body>
 
 </html>
