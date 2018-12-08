@@ -11,9 +11,9 @@ This repo contaian 2 python files and html taemblets folder.
 I used Bootstrap, jquery, Google authentaction, bycrypt libarary for hashing,smtplib and MIMEText to create and send emails(for resetpassword) and validate_email libarary for validating emails :) , I did uae session mangment and reset password to make my app more relastic (I got carried out lol).
 
 
-To use google login you need to create app on google api devloper console to get app clientid.
+#### To use google login you need to create app on google api devloper console to get app clientid.
 
-You Don't need to do the step above becuses NasserZon has registration and login :).
+#### You Don't need to do the step above becuses NasserZon has registration and login :).
 
 
 This project has 2 json api endpoints:
@@ -43,4 +43,4 @@ References:
 - https://pypi.org/project/validate_email/
 - https://pypi.org/project/bcrypt/
 - https://docs.python.org/3/library/smtplib.html?highlight=smtp_ssl
-- https://docs.python.org/2/library/email.mime.html
+- https://docs.python.org/3/library/email.mime.html
