@@ -227,9 +227,6 @@ def logout():
 
     gdisconnect()
     session.clear()
-    for key in session.keys():
-        session.pop(key)
-
     return redirect('/')
 
 

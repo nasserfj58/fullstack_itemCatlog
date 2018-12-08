@@ -44,3 +44,4 @@ References:
 - https://pypi.org/project/bcrypt/
 - https://docs.python.org/3/library/smtplib.html?highlight=smtp_ssl
 - https://docs.python.org/3/library/email.mime.html
+- https://www.programcreek.com/python/example/79006/flask.session.clear
