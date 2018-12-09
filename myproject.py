@@ -104,12 +104,12 @@ def AddUser():
                 uname=uname,
                 email=email)
 
-        myMenueItem = User(
+        user = User(
             username=request.form['username'],
             email=request.form['email'],
             password=hashed)
 
-        dbsession.add(myMenueItem)
+        dbsession.add(user)
         dbsession.commit()
         return redirect('/login')
 
@@ -443,14 +443,14 @@ def Add():
 
     if request.method == 'POST':
 
-        myMenueItem = Product(
+        product = Product(
             name=request.form['name'],
             price=request.form['price'],
             desc=request.form['desc'],
             typeId=request.form['ptype'],
             userId=session['userid'])
 
-        dbsession.add(myMenueItem)
+        dbsession.add(product)
         dbsession.commit()
 
         return redirect(url_for('GetProducts'))
@@ -467,17 +467,17 @@ def Edit(id):
         return redirect('/login')
 
     userid = session['userid']
-    myMenueItem = dbsession.query(Product).filter_by(id=id).first()
+    product = dbsession.query(Product).filter_by(id=id).first()
 
-    if myMenueItem.userId != userid:
-        return "You dont have acsses !!s"
+    if product.userId != userid:
+        return "You dont have acsses !!"
 
     if request.method == 'POST':
 
-        myMenueItem.name = request.form['name']
-        myMenueItem.price = request.form['price']
-        myMenueItem.desc = request.form['desc']
-        myMenueItem.typeId = request.form['ptype']
+        product.name = request.form['name']
+        product.price = request.form['price']
+        product.desc = request.form['desc']
+        product.typeId = request.form['ptype']
 
         dbsession.commit()
 
@@ -485,16 +485,16 @@ def Edit(id):
 
     ptypes = dbsession.query(ProductType).all()
 
-    return render_template('edititme.html', ptypes=ptypes, product=myMenueItem)
+    return render_template('edititme.html', ptypes=ptypes, product=product)
 
 
 @app.route('/Show/<int:id>')
 def Show(id):
 
-    myMenueItem = dbsession.query(Product).filter_by(id=id).first()
+    product = dbsession.query(Product).filter_by(id=id).first()
     ptypes = dbsession.query(ProductType).all()
 
-    return render_template('showitem.html', ptypes=ptypes, item=myMenueItem)
+    return render_template('showitem.html', ptypes=ptypes, item=product)
 
 
 @app.route('/Delete/<int:id>', methods=['POST'])
@@ -504,14 +504,14 @@ def Delete(id):
 
     userid = session['userid']
 
-    myMenueItem = dbsession.query(Product).filter_by(id=id).first()
+    product = dbsession.query(Product).filter_by(id=id).first()
 
-    if myMenueItem.userId != userid:
+    if product.userId != userid:
         return redirect('/login')
 
     if request.method == 'POST':
 
-        dbsession.delete(myMenueItem)
+        dbsession.delete(product)
         dbsession.commit()
 
         return redirect(url_for('GetProducts'))
