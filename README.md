@@ -30,7 +30,7 @@ To try this code You need to:
 4. cd/ vagrant to acsees the shared files.
 5. move The downladed files to vagrant shared files
 6. Run python storedb_setup.py to create the db with required tables and python fillDbdata.py to fill dummy data.
-7. download external libariries (bcrypt and validate_email) by runing these commands ('pip install validate_email' and 'pip install bcrypt' ) if you get an error from your VM saying that you dont have acsses run the same commands with '--user' in the end of the command(I run to this problem and adding --user in the end fixed it).
+7. Install external libraries (bcrypt and validate_email) by ruining these commands ('pip install validate_email' and 'pip install bcrypt' ) if you get an error from your VM saying that you don't have accesses run the same commands with '--user' in the end of the command(I run to this problem and adding --user in the end fixed it).
 8. run python myproject.py and start to play(you need to create an acount to add delete and edit)
 9. type localhost:8000 on your browser to see the webapp.
 
