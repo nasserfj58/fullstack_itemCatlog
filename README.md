@@ -31,8 +31,11 @@ To try this code You need to:
 5. move The downladed files to vagrant shared files
 6. Run python storedb_setup.py to create the db with required tables and python fillDbdata.py to fill dummy data.
 7. Install external libraries (bcrypt and validate_email) by ruining these commands ('pip install validate_email' and 'pip install bcrypt' ) if you get an error from your VM saying that you don't have accesses run the same commands with '--user' in the end of the command(I run to this problem and adding --user in the end fixed it).
-8. run python myproject.py and start to play(you need to create an acount to add delete and edit)
-9. type localhost:8000 on your browser to see the webapp.
+8. Create new App in https://console.cloud.google.com and make the Authorized JavaScript origins : localhost:8000 and 
+the Authorized redirect URIs : localhost:8000/login and localhost:8000/
+9. downlad Client ID for Web application as json on the root dirctory of vagrant and rename it to client_secret.json
+10. run python myproject.py and start to play(you need to create an acount to add delete and edit)
+11. type localhost:8000 on your browser to see the webapp.
 
 
 You can find the link to the fullstack-nanodegree-vm from  https://github.com/udacity/fullstack-nanodegree-vm.
