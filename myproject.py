@@ -195,18 +195,25 @@ def forgot():
             # https://myaccount.google.com/lesssecureapps
             # enter to allow Access for less secure app
             # to send email with gmail stmp
-            emailaccount = 'youremail@gmail.com'
-            emailpassword = 'yourpassword'
-            s = smtplib.SMTP_SSL('smtp.googlemail.com', 465)
-            s.login(emailaccount, emailpassword)
-            s.sendmail(sender, [reciver], emailmsg.as_string())
-            s.quit()
-            return render_template(
-                "forgot.html",
-                isSucsses=True,
-                message="""Reset link Send sescusefully,
-                Please check your email inbox"""
-                )
+            try:
+                emailaccount = 'youremail@gmail.com'
+                emailpassword = 'yourpassword'
+                s = smtplib.SMTP_SSL('smtp.googlemail.com', 465)
+                s.login(emailaccount, emailpassword)
+                s.sendmail(sender, [reciver], emailmsg.as_string())
+                s.quit()
+                return render_template(
+                    "forgot.html",
+                    isSucsses=True,
+                    message="""Reset link Send sescusefully,
+                    Please check your email inbox"""
+                    )
+            except smtplib.SMTPAuthenticationError:
+                return render_template(
+                    "forgot.html",
+                    isSucsses=False,
+                    message="Internal Error!!")
+
         else:
             return render_template(
                 "forgot.html",
