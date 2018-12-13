@@ -54,7 +54,7 @@ class Product(Base):
         String(250), nullable = False
     )
     price = Column(
-        NUMERIC, nullable = False
+        Integer, nullable = False
     )
     ProductType = relationship(ProductType)
     User = relationship(User)

@@ -52,7 +52,7 @@
             <div class="caption text-center" style="height:20%">
                     <div class="text-center">
                
-                            {{'%0.2f'| format(item.price|float)}}
+                            {{item.price}}
                             <br />
                             {% for ptype in ptypes%}
                               {% if ptype.id == item.typeId %}

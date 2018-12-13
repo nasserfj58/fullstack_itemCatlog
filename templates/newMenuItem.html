@@ -1,0 +1,19 @@
+<html>
+    <head></head>
+    <body>
+        <form method="post" action="{{url_for('newMenuItem', restaurant_id = restaurant_id )}}"">
+            <label for="name">Name</label>
+            <input type="text" name="name"/>
+            <br />
+            <label for="desc">Desc</label>
+            <input type="text" name="desc"/>
+            <br />
+            <label for="price">price</label>
+            <input type="text" name="price"/>
+            <br />
+            <input type="submit" value="Submit" />
+            <br />
+            <a href='{{url_for('GetMenu', res_id = restaurant_id) }}'>Back</a>
+        </form>
+    </body>
+</html>
