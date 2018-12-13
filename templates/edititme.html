@@ -46,11 +46,14 @@
     <div class="container input-group">
             <h3> New Product<span class="label label-default"></span></h3>
             <br />
-
+            {% if message %}
+            <div class="alert alert-danger" role="alert">{{message}}</div>
+            {% endif %}
             <div class="row">
               <div class="col-md-6">  
             <form method="post" action="{{url_for('Edit', id = product.id)}}">
                     <label  for="name">Name</label>
+                    
                     <br />
                     <input class= "form-control" width="50%" type="text" name="name" placeholder="name" value="{{product.name}}"/>
                     <br />
@@ -78,8 +81,8 @@
                 {% endif %}
                 {% endfor %}
             </select>
-                    <br />
-                    <br />
+                    </br>
+                    </br>
                     <input class="btn btn-default" type="submit" value="Edit" />
                 </form>
             </div>

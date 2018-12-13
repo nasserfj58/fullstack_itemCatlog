@@ -46,36 +46,40 @@
     <div class="container input-group">
             <h3> New Product<span class="label label-default"></span></h3>
             <br />
+            {% if message %}
+            <div class="alert alert-danger" role="alert">{{message}}</div>
+            {% endif %}
             
             <div class="row">
+                
               <div class="col-md-6">  
             <form method="post" action="/Add">
                     <label  for="name">Name</label>
                     <br />
-                    <input class= "form-control" width="50%" type="text" name="name" placeholder="name"/>
+                    <input class= "form-control required" width="50%" type="text" name="name" placeholder="name"/>
                     <br />
                     <br />
                     <label  for="desc">Description</label>
                     <br />
-                    <textarea class= "form-control" width="50%" name="desc" placeholder="description" ></textarea>
+                    <textarea class= "form-control required" width="50%" name="desc" placeholder="description" ></textarea>
                     <br />
                     <br />
                     <label  for="price">Price</label>
                     <br />
-                    <input type="text" name="price" width="50%" class= "form-control" placeholder="price"/>
+                    <input type="text" name="price" width="50%" class= "form-control required" placeholder="price"/>
                     <br />
                     <br />
                     <label  for="ptype">Categorey</label>
                     <br />
-                    <select name="ptype">
+                    <select name="ptype" class="required">
                     <option value="0" SELECTED> Select
                     {% for x in ptypes %}
                     
                 <option value="{{ x.id }}">{{ x.name }}</option>
                 {% endfor %}
             </select>
-                    <br />
-                    <br />
+                    </br>
+                    </br>
                     <input class="btn btn-default" type="submit" value="Add" />
                 </form>
             </div>

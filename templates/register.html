@@ -1,7 +1,14 @@
 <html>
 
 <head>
-       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+
+    <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
 </head>
 
@@ -18,14 +25,7 @@
             <div class="col-md-6">
                 
                 <form method="post" action="{{url_for('AddUser')}}">
-                    <div>
-                        <label for="name">UserName</label>
-                        <br />
-                        
-                        <input size="8" class="form-control required" type="text" name="username" placeholder="UserName" value="{{uname}}"/>
-
-
-                    </div>
+                    
                     <br />
                     <br />
                     <div>
@@ -55,10 +55,6 @@
                         <div id='result'></div>
 
                     </div>
-				</form>
-			</div>
-		</div>
-	</div>
              
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>

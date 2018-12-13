@@ -20,11 +20,12 @@ from email.mime.text import MIMEText
 
 class ViewProduct(object):
 
-    def __init__(self, name, description, price, catagorey):
+    def __init__(self, id, name, description, price, catagorey):
         self.name = name
         self.description = description
         self.price = price
         self.catagorey = catagorey
+        self.id = id
 
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
@@ -62,12 +63,12 @@ def GetUserIdbyusername(username):
 def AddUser():
     if request.method == 'POST':
 
-        uname = request.form['username']
+        uname = ''
         password = request.form['pass']
         email = request.form['email']
         hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-        if not uname or not password or not email:
+        if not password or not email:
             return render_template(
                 'register.html',
                 message="All fileds are mandtory!!",
@@ -87,39 +88,32 @@ def AddUser():
                 message="Password must be Bigger than 7 chracters!!",
                 uname=uname,
                 email=email)
-
+        uname = email.split('@')
         userId = GetUserIdbyEmail(email)
-        userId2 = GetUserIdbyusername(uname)
-
         if userId:
             return render_template(
                 'register.html',
                 message="Email Is Registed already!!",
-                uname=uname,
                 email=email)
-        if userId2:
-            return render_template(
-                'register.html',
-                message="Username Is Registed already!!",
-                uname=uname,
-                email=email)
-
         user = User(
-            username=request.form['username'],
-            email=request.form['email'],
+            username=uname[0] + uname[1].split('.')[0],
+            email=email,
             password=hashed)
 
         dbsession.add(user)
         dbsession.commit()
-        return redirect('/login')
+        return render_template(
+                'login.html',
+                message="New Account Created, Please login",
+                email='')
 
 
 def CreateUser(session):
-    newUser = User(name=session['username'], email=session['email'])
+    newUser = User(username=session['username'], email=session['email'])
     dbsession.add(newUser)
     dbsession.commit()
     user = dbsession.query(User).filter_by(email=session['email']).one()
-    return user.id
+    return user
 
 
 @app.route('/register')
@@ -366,11 +360,10 @@ def gconnect():
     answer = requests.get(userinfo_url, params=params)
 
     data = answer.json()
-
-    session['username'] = data['name']
-    session['picture'] = data['picture']
+    # all usernames are the part of the email befor @ + email provider
+    uname = data['email'].split('@')
+    session['username'] = uname[0] + uname[1].split('.')[0]
     session['email'] = data['email']
-
     currentuser = GetUserIdbyEmail(data['email'])
     if not currentuser:
         currentuser = CreateUser(session)
@@ -381,7 +374,7 @@ def gconnect():
 
     output = ''
     output += '<h1>Welcome, '
-    output += session['username']
+    output += data['name']
     output += '!</h1>'
     flash("you are now logged in as %s" % session['username'])
     print("done!")
@@ -410,7 +403,6 @@ def gdisconnect():
         del session['gplus_id']
         del session['username']
         del session['email']
-        del session['picture']
         del session['userid']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
@@ -442,13 +434,21 @@ def Add():
         redirect('/login')
 
     if request.method == 'POST':
-
+        name = request.form['name']
+        price = request.form['price']
+        desc = request.form['desc']
+        typeId = request.form['ptype']
+        if not name or not price or not desc or typeId == '0':
+            ptypes = dbsession.query(ProductType).all()
+            return render_template(
+                'additem.html', ptypes=ptypes,
+                message="All fileds are Mandtory")
         product = Product(
-            name=request.form['name'],
-            price=request.form['price'],
-            desc=request.form['desc'],
-            typeId=request.form['ptype'],
-            userId=session['userid'])
+          name=request.form['name'],
+          price=request.form['price'],
+          desc=request.form['desc'],
+          typeId=request.form['ptype'],
+          userId=session['userid'])
 
         dbsession.add(product)
         dbsession.commit()
@@ -473,11 +473,20 @@ def Edit(id):
         return "You dont have acsses !!"
 
     if request.method == 'POST':
+        name = request.form['name']
+        price = request.form['price']
+        desc = request.form['desc']
+        typeId = request.form['ptype']
+        if not name or not price or not desc or typeId == '0':
+            ptypes = dbsession.query(ProductType).all()
+            return render_template(
+                'edititme.html', ptypes=ptypes,
+                message="All fileds are Mandtory", product=product)
 
-        product.name = request.form['name']
-        product.price = request.form['price']
-        product.desc = request.form['desc']
-        product.typeId = request.form['ptype']
+        product.name = name
+        product.price = price
+        product.desc = desc
+        product.typeId = typeId
 
         dbsession.commit()
 
@@ -485,7 +494,8 @@ def Edit(id):
 
     ptypes = dbsession.query(ProductType).all()
 
-    return render_template('edititme.html', ptypes=ptypes, product=product)
+    return render_template(
+        'edititme.html', ptypes=ptypes, product=product, message='')
 
 
 @app.route('/Show/<int:id>')
@@ -537,21 +547,21 @@ def GetAllProducts(catagorey='All'):
             prodType = ptype.name
         else:
             prodType = ""
-
-        obj = ViewProduct(product.name, product.desc,
-                          str(product.price), prodType)
+        obj = ViewProduct(
+            product.id, product.name, product.desc,
+            str(product.price), prodType)
         jsonProducts.append(json.dumps(obj.__dict__))
 
     return jsonify(jsonProducts)
 
 
 @app.route('/api/get/product/')
-@app.route('/api/get/product/<string:name>/')
-def GetProduct(name=None):
+@app.route('/api/get/product/<int:id>/')
+def GetProduct(id=0):
 
-    if name:
-        product = dbsession.query(Product).filter(
-            Product.name.like(name)).first()
+    if id:
+        product = dbsession.query(Product).filter_by(
+            id=id).first()
         if product:
             ptype = ptype = dbsession.query(
                 ProductType).filter_by(id=product.typeId).first()
@@ -559,13 +569,13 @@ def GetProduct(name=None):
                 prodType = ptype.name
             else:
                 prodType = ""
-
-            obj = ViewProduct(product.name, product.desc,
-                              str(product.price), prodType)
+            obj = ViewProduct(
+                product.id, product.name, product.desc,
+                str(product.price), prodType)
 
             return json.dumps(obj.__dict__)
 
-    return jsonify(name="", description="", price="", type="")
+    return jsonify(id="", name="", description="", price="", type="")
 
 
 if __name__ == '__main__':
