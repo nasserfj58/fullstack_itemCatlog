@@ -15,11 +15,12 @@ I used Bootstrap, jquery, Google authentaction, bycrypt libarary for hashing,smt
 
 #### You Don't need to do the step above becuses NasserZon has registration and login :).
 
+### To use reset password functionality you must provide your email and password on myproject.py line 199 and 200 (gmail account) or change stmp configuration.
 
 This project has 2 json api endpoints:
 
-1. All products based on category uri like localhost:8000/api/get/products/smartphone or /api/get/products/ to get all products
-2. One product based on product name like localhost:8000/api/get/products/oneplus6
+1. All products based on category uri like localhost:8000/api/get/products/smartphone or /api/get/products/ to get all products/
+2. One product based on product id like localhost:8000/api/get/product/1, you can get the product id from the api above.
 
 To try this code You need to:
 
