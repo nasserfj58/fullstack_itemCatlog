@@ -20,7 +20,7 @@ class User(Base):
         String(250), nullable = False
     )
     password = Column(
-        LargeBinary, nullable = False
+        LargeBinary, nullable = True
     )
     forgouttoken = Column(
         LargeBinary, nullable = True
