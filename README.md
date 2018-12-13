@@ -15,7 +15,7 @@ I used Bootstrap, jquery, Google authentaction, bycrypt libarary for hashing,smt
 
 #### You Don't need to do the step above becuses NasserZon has registration and login :).
 
-### To use reset password functionality you must provide your email and password on myproject.py line 198 and 199 (gmail account) or change stmp configuration.
+### To use reset password functionality you must provide your email and password on myproject.py line 199 and 200 (gmail account) or change stmp configuration.
 
 This project has 2 json api endpoints:
 
